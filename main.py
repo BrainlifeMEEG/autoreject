@@ -62,30 +62,20 @@ print(f'Loaded {len(epochs)} epochs')
 
 product_items = []
 
-
-def parse_int_list(value, default):
-    if value is None or value == '' or value == 'None':
-        return default
-    try:
-        return [int(x.strip()) for x in str(value).split(',') if x.strip()]
-    except Exception as e:
-        print(f'Warning: Could not parse "{value}" as a list of ints, using default {default}: {e}')
-        return default
-
-
-def parse_float_list(value, default):
-    if value is None or value == '' or value == 'None':
-        return default
-    try:
-        return [float(x.strip()) for x in str(value).split(',') if x.strip()]
-    except Exception as e:
-        print(f'Warning: Could not parse "{value}" as a list of floats, using default {default}: {e}')
-        return default
-
-
 # == PARSE PARAMETERS ==
-n_interpolate = parse_int_list(config.get('n_interpolate'), [1, 4, 32])
-consensus = parse_float_list(config.get('consensus'), list(np.linspace(0, 1.0, 11)))
+n_interpolate = [1, 4, 32]
+if config.get('n_interpolate') not in (None, '', 'None'):
+    try:
+        n_interpolate = [int(x.strip()) for x in str(config['n_interpolate']).split(',') if x.strip()]
+    except Exception as e:
+        print(f'Warning: Could not parse n_interpolate "{config["n_interpolate"]}", using default {n_interpolate}: {e}')
+
+consensus = list(np.linspace(0, 1.0, 11))
+if config.get('consensus') not in (None, '', 'None'):
+    try:
+        consensus = [float(x.strip()) for x in str(config['consensus']).split(',') if x.strip()]
+    except Exception as e:
+        print(f'Warning: Could not parse consensus "{config["consensus"]}", using default: {e}')
 
 cv = int(config.get('cv') or 10)
 picks = config.get('picks') or None
