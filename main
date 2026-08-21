@@ -6,6 +6,7 @@
 #SBATCH --mem=20G
 #SBATCH --time=02:00:00
 
-mkdir -p out_dir out_figs out_report
+set -e
+set -x
 
 singularity exec docker://brainlifemeeg/mne:1.12.1 python3 main.py
