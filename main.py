@@ -27,6 +27,7 @@ Outputs:
 
 import sys
 import os
+import datetime
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'brainlife_utils'))
 
 # Standard imports
@@ -58,7 +59,7 @@ require_config_keys(config, ['epo'])
 
 # == LOAD DATA ==
 epochs = mne.read_epochs(config['epo'], preload=True)
-print(f'Loaded {len(epochs)} epochs')
+print(f'Loaded {len(epochs)} epochs', flush=True)
 
 product_items = []
 
@@ -98,6 +99,19 @@ fig[0].savefig(os.path.join('out_figs', 'epochs_before.png'))
 plt.close(fig[0])
 
 # == FIT AUTOREJECT ==
+# n_jobs defaults to 1 (AutoReject's own default) unless the caller passes
+# a higher value matching the job's actual CPU allocation -- the CV grid
+# search over n_interpolate x consensus candidates parallelizes across
+# it, so leaving this at 1 wastes however many cores Slurm allocated.
+# verbose=True (not the previous False): AutoReject has real per-candidate
+# progress reporting by default: silencing it was making a genuinely
+# multi-hour CV search (confirmed on the ICM cluster: still running past
+# 4h with zero log output, eventually Slurm-walltime-killed) indistinguish-
+# able from a hang, the exact same ambiguity already found+fixed for
+# ICA-fit (see that app's own commit history for the pattern).
+print(f'[{datetime.datetime.now().isoformat()}] Starting AutoReject fit '
+      f'(n_interpolate={n_interpolate}, consensus={len(consensus)} values, '
+      f'cv={cv}, n_jobs={n_jobs}) on {len(epochs)} epochs...', flush=True)
 ar = AutoReject(
     n_interpolate=n_interpolate,
     consensus=consensus,
@@ -106,9 +120,11 @@ ar = AutoReject(
     thresh_method=thresh_method,
     random_state=random_state,
     n_jobs=n_jobs,
-    verbose=False,
+    verbose=True,
 )
 ar.fit(epochs)
+print(f'[{datetime.datetime.now().isoformat()}] AutoReject fit done, '
+      f'transforming...', flush=True)
 epochs_clean, reject_log = ar.transform(epochs, return_log=True)
 
 # == SUMMARY STATS ==
