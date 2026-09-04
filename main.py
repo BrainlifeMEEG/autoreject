@@ -10,7 +10,7 @@ Inputs:
     - epo: Path to MNE epochs .fif file
 
 Outputs:
-    - out_dir/epo.fif: Cleaned epochs (bad epochs dropped, bad channels interpolated)
+    - out_dir/meg-epo.fif: Cleaned epochs (bad epochs dropped, bad channels interpolated)
     - out_dir/info.txt: Summary of dropped epochs / interpolated channels
     - out_figs/reject_log.png: Visualization of the reject log
     - out_figs/epochs_before.png, out_figs/epochs_after.png: Before/after comparison
@@ -149,7 +149,7 @@ fig[0].savefig(os.path.join('out_figs', 'epochs_after.png'))
 plt.close(fig[0])
 
 # == SAVE CLEANED EPOCHS ==
-out_epo_path = os.path.join('out_dir', 'epo.fif')
+out_epo_path = os.path.join('out_dir', 'meg-epo.fif')
 epochs_clean.save(out_epo_path, overwrite=True)
 
 # Validate round-trip before declaring success
