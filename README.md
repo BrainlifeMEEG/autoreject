@@ -1,5 +1,52 @@
 # Autoreject
 
+<!-- brainlife-app:begin (generated from the App manifest; edit the manifest, not this block) -->
+
+> **Cleans epoched MEG/EEG data with autoreject, learning per-channel rejection thresholds by cross-validation to interpolate bad channels and drop bad epochs, and outputs the cleaned epochs and QC figures.**
+
+Fits autoreject with candidate n_interpolate and consensus values (cross-validated, Bayesian optimization or random search) and applies it, interpolating repairable channels within epochs and dropping epochs with too many bad channels. Use it after epoching as an automated alternative to fixed peak-to-peak rejection. It needs epochs with sensor positions; runs can take hours on large datasets.
+
+| | |
+|---|---|
+| 📥 **Inputs** | `neuro/meeg/mne/epochs` |
+| 📤 **Outputs** | `neuro/meeg/mne/epochs` |
+| 🐳 **Container** | `brainlifemeeg/mne:1.12.1` |
+| ⚙️ **Resources** | 8 CPUs · 20 GB memory · 8 h walltime |
+| 🔗 **Run it** | [doi.org/10.25663/brainlife.app.954](https://doi.org/10.25663/brainlife.app.954) |
+
+#### 📥 Inputs
+
+| Input | Datatype | Required | Description |
+|---|---|---|---|
+| `epo` | `neuro/meeg/mne/epochs` | yes | Epoched MEG/EEG data in MNE epochs .fif format. |
+
+#### 📤 Outputs
+
+| Output | Datatype | Description |
+|---|---|---|
+| `out_dir` | `neuro/meeg/mne/epochs` | Cleaned epochs after autoreject (bad epochs dropped, bad channels interpolated) |
+
+<details>
+<summary><b>⚙️ Parameters</b> (7)</summary>
+
+| Parameter | Type | Default | Description |
+|---|---|---|---|
+| `n_interpolate` | string | `1,4,32` | Candidate values (comma-separated) for number of channels to interpolate per epoch, tried during cross-validation |
+| `consensus` | string |  | Candidate consensus fractions (comma-separated). Empty = 11 evenly spaced values 0–1 |
+| `cv` | number | `10` | Number of cross-validation folds |
+| `picks` | string |  | Channel type to run on (e.g. eeg, meg). Empty = infer from data |
+| `thresh_method` | string | `bayesian_optimization` | Threshold search strategy: bayesian_optimization or random_search |
+| `random_state` | number | `42` | Random seed for reproducibility |
+| `n_jobs` | number | `8` | Parallel jobs for cross-validated search; should match allocated CPUs (currently 8) |
+
+</details>
+
+📚 **References used by this App:**
+- Hayashi S, Caron BA, Heinsfeld AS, et al. brainlife.io: a decentralized and open-source cloud platform to support neuroscience research. Nat Methods 21:809-813 (2024). [doi:10.1038/s41592-024-02237-2](https://doi.org/10.1038/s41592-024-02237-2)
+- Gramfort A, et al. MEG and EEG data analysis with MNE-Python. Front Neurosci 7:267 (2013). [doi:10.3389/fnins.2013.00267](https://doi.org/10.3389/fnins.2013.00267)
+
+<!-- brainlife-app:end -->
+
 [![Run on Brainlife.io](https://img.shields.io/badge/Brainlife-bl.app.954-blue.svg)](https://doi.org/10.25663/brainlife.app.954)
 [![Abcdspec-compliant](https://img.shields.io/badge/ABCD_Spec-v1.1-green.svg)](https://github.com/brain-life/abcd-spec)
 
